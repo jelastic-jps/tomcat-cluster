@@ -1,0 +1,165 @@
+type: update                                                                                                                                                                                                                    
+version: 1.8.1                                                                                                                                                                                                                  
+id: tomcat-cluster                                                                                                                                                                                                              
+baseUrl: https://raw.githubusercontent.com/jelastic-jps/tomcat-cluster/master/addons/auto-clustering                                                                                                                                            
+description:                                                                                                                                                                                                                     
+  short: Tomcat Cluster Logic                                                                                                                                                                                                                                 
+name: Tomcat Cluster Logic
+
+targetNodes: none
+
+nodeGroupAlias:
+  ${settings.nodeGroup}: cp
+
+globals:
+  serverConfig: /opt/tomcat/conf/server.xml
+  mainRulesFile: /etc/sysconfig/iptables
+  customRulesFile: /etc/sysconfig/iptables-custom
+                                                                                                                                                                              
+onInstall:
+  - cleanupCustomFWRules: ${nodes.cp.join(id,)}
+  - removeClusterConfig: ${nodes.cp.join(id,)}
+  - applyClusterTemplate: ${nodes.cp.join(id,)}
+  - addConfigToRedeployConf: ${nodes.cp.join(id,)}
+  - applyHostName
+  - addNodes
+  - addFWRuleForEnv
+  - addFWRuleForContainer: ${nodes.cp.join(id,)}
+  - cmd[cp]: jem service restart
+            
+onBeforeScaleIn[cp]:
+  - forEach (event.response.nodes):
+    - cmd[cp]: jcm removeNode ${@i.intIP}
+    
+onAfterScaleIn[cp]:
+  - cmd[cp]: jem service restart
+
+onAfterScaleOut[cp]:
+  - cleanupCustomFWRules: ${event.response.nodes.join(id,)}
+  - applyClusterTemplate: ${event.response.nodes.join(id,)}
+  - addConfigToRedeployConf: ${nodes.cp.join(id,)}
+  - applyHostName
+  - addNodes
+  - addFWRuleForContainer: ${event.response.nodes.join(id,)}
+  - cmd[cp]: jem service restart
+            
+onAfterClone:
+  - script: delete MANIFEST.id; return {result:0, jps:MANIFEST};
+  - install: ${response.jps}
+    envName: ${event.response.env.envName}
+    settings:
+      nodeGroup: ${settings.nodeGroup} 
+
+onUninstall:
+  - removeClusterConfig: ${nodes.cp.join(id,)}
+  - removeClusteringFirewallRule
+  
+onAfterMigrate:
+  - cleanupNodes: ${nodes.cp.join(id,)}
+  - addNodes
+  - cmd[cp]: jem service restart
+  
+onAfterRedeployContainer[cp]:
+  - checkClusterConfig
+  - addNodes
+  - cmd[cp]: jem service restart
+  
+onBeforeSetCloudletCount[cp]:
+  - applyHostName
+  
+onBeforeRemoveNode[cp]:
+  if (nodes.cp.length == 1):
+    install:
+      type: update
+      id: tomcat-cluster
+      name: Tomcat Cluster Logic
+      
+actions: 
+  addFWRuleForEnv:
+    - script: |
+        var envName = "${env.name}", nodeGroup="cp", inputRuleExists = new Boolean(false);
+        var inputRule = {"direction":"INPUT","name":"Clustering","protocol":"TCP","ports":4004,"src":"ALL","priority":1200,"action":"ALLOW"};
+        var outputRule = {"direction":"OUTPUT","name":"Clustering","protocol":"TCP","ports":4004,"dst":"ALL","priority":1300,"action":"ALLOW"};
+        if (jelastic.environment.security) {
+          resp = jelastic.billing.account.GetOwnerQuotas(appid, session, 'firewall.enabled');
+          if (!resp || resp.result !== 0) return resp;
+          bFireWallEnabled = resp.array[0] ? resp.array[0].value : 0;
+          if (bFireWallEnabled) {
+            var rules = jelastic.environment.security.GetRules(envName, session, nodeGroup, 'INPUT').rules;
+            for (var i = 0; i < rules.length; i ++) {
+                if (rules[i].ports == 4004) {
+                    resp = jelastic.environment.security.RemoveRule(envName, session, rules[i].id);
+                    if (!resp || resp.result !== 0) return resp;
+                }
+            }
+            resp = jelastic.environment.security.AddRule(envName, session, inputRule, nodeGroup);
+            if (!resp || resp.result !== 0) return resp;
+            var rules = jelastic.environment.security.GetRules(envName, session, nodeGroup, 'OUTPUT').rules;
+            for (var i = 0; i < rules.length; i ++) {
+                if (rules[i].ports == 4004) {
+                    resp = jelastic.environment.security.RemoveRule(envName, session, rules[i].id);
+                    if (!resp || resp.result !== 0) return resp;
+                }
+            }
+            return jelastic.environment.security.AddRule(envName, session, outputRule, nodeGroup);
+          }
+          else { return { result: 0 }}
+        }
+        
+  addFWRuleForContainer:
+    - cmd[${this}]: |-
+        if ! grep -q "Tomcat\/TomEE Clustering" ${globals.customRulesFile}; then
+            echo -e "*filter\n-A INPUT -p tcp -m tcp --dport 4004 -j ACCEPT -m comment --comment \"Tomcat/TomEE Clustering\"" >> ${globals.customRulesFile}
+            echo -e "-A OUTPUT -p tcp -m tcp --dport 4004 -j ACCEPT -m comment --comment \"Tomcat/TomEE Clustering\"\nCOMMIT" >> ${globals.customRulesFile}
+        fi
+        
+  removeClusteringFirewallRule:
+    - script: |
+        var envName = "${env.name}", nodeGroup="cp";
+        var rules = jelastic.environment.security.GetRules(envName, session, nodeGroup, 'INPUT').rules;
+        for (var i = 0; i < rules.length; i ++) {
+            if (rules[i].ports == 4004) {
+                resp = jelastic.environment.security.RemoveRule(envName, session, rules[i].id);
+                if (!resp || resp.result !== 0) return resp;
+            }
+        }
+        var rules = jelastic.environment.security.GetRules(envName, session, nodeGroup, 'OUTPUT').rules;
+        for (var i = 0; i < rules.length; i ++) {
+            if (rules[i].ports == 4004) {
+                return jelastic.environment.security.RemoveRule(envName, session, rules[i].id);
+            }
+        }
+        return { result: 0 }
+
+  applyClusterTemplate:
+    - cmd[${this}]: jcm applyClusterTemplate ${baseUrl}
+      user: root
+    
+  removeClusterConfig:
+    - cmd[${this}]: jcm removeClusterConfig
+
+  checkClusterConfig:
+    - cmd[cp]: jcm checkClusterConfig ${baseUrl}
+    
+  cleanupNodes:
+    - cmd[${this}]: jcm cleanupNodes
+ 
+  cleanupCustomFWRules: 
+    - cmd[${this}]: |-
+        sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.mainRulesFile};
+        service iptables restart;
+        sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.customRulesFile}
+      user: root
+  
+  applyHostName:
+    - cmd[cp]: jcm applyHostIpInConfig
+      user: root
+      
+  addNodes:
+    - forEach(nodes.cp):
+      - cmd[cp]: jcm addNode ${@i.intIP} ${@i.id}
+        user: root
+        
+  addConfigToRedeployConf:
+    - cmd[${this}]:  jcm addConfigToRedeployConf
+      user: root

@@ -4,11 +4,9 @@
 
 # Tomcat/TomEE Auto-Clustering
 
-The Apache Tomcat/TomEE remain popular over the years and work great in a clustered environment ensuring required level of high availability and scalability while hosting your applications. You can easily deploy such a cluster avoiding a setup complexity and even providing load balancing request distribution for it.
-
+The Apache Tomcat/TomEE remain popular over the years and work great in a clustered environment ensuring required level of high availability and scalability while hosting your applications. You can easily deploy such a cluster avoiding a setup complexity and even providing load balancing to efficiently distribute incoming traffic.
 
 ## Tomcat/TomEE Cluster Topology
-
 
 Due to the native Tomcat clustering architecture, its topology includes two node groups:   
 
@@ -29,7 +27,6 @@ Tomcat/TomEE cluster is configured to scale automatically. The appropriate modif
 
 In case you’d like to setup scaling strategy for your cluster, refer to the appropriate triggers parameters within the [Automatic Horizontal Scaling](https://docs.jelastic.com/automatic-horizontal-scaling) settings section.
 
-
 ## Cloud Hosting Deployment
 
 ### Public Cloud
@@ -38,7 +35,6 @@ To instantly host your own scalable Tomcat/TomEE cluster, click the **DEPLOY TO 
 
 
 [![Deploy](https://github.com/jelastic-jps/git-push-deploy/raw/master/images/deploy-to-jelastic.png)](https://jelastic.com/install-application/?manifest=https://raw.githubusercontent.com/jelastic-jps/tomcat-cluster/master/manifest.jps)
-
 
 ### Private Cloud
 

@@ -19,7 +19,7 @@ Due to the native Tomcat clustering architecture, its topology includes two node
 
 Current implementation of Jelastic scalable Tomcat/TomEE cluster is built on top of Docker containers. This ensures additional reliability through operating each node as an isolated instance and enables simple [container update](https://docs.jelastic.com/docker-update) procedure. 
 
-Upon cluster deployment, you will get the already configured and ready-to-work Apache Tomcat/TomEE cluster in the Cloud, that comprises 2 Tomcat/TomEE application servers (workers), NGINX load balancer ин by default. 
+Upon cluster deployment, you will get the already configured and ready-to-work Apache Tomcat/TomEE cluster in the Cloud, that comprises 2 Tomcat/TomEE application servers (workers) and NGINX load balancer by default. 
 
 ## Automatic Scaling and Clustering Configuration 
 

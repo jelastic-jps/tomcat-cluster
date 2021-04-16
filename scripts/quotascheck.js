@@ -24,7 +24,7 @@ for (var i = 0, n = q.length; i < n; i++) {
   }
 
 }
-resp = {result: 0, settings: {fields: [{type: "spinner", name: "nodes", caption: "Nodes Count", min: 3, max: max, "default": Math.min(min, max)},{"caption":"Stack","type":"list","name":"stack","default":"tomcat","required":true,"values":[{"value":"tomcat","caption":"Tomcat"},{"value":"tomee","caption":"TomEE"}]}]}};
+resp = {result: 0, settings: {fields: [{type: "spinner", name: "nodes", caption: "Nodes Count", min: 2, max: max, "default": Math.min(min, max)},{"caption":"Stack","type":"list","name":"stack","default":"tomcat","required":true,"values":[{"value":"tomcat","caption":"Tomcat"},{"value":"tomee","caption":"TomEE"}]}]}};
 resp.ssl = ssl;
 
 if (markup) {

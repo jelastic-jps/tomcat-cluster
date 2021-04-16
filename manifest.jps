@@ -1,0 +1,21 @@
+type: install
+version: 1.8.1
+baseUrl: https://raw.githubusercontent.com/jelastic-jps/tomcat-cluster/master
+logo: /images/tomcat-cluster-logo-70px.png
+id: tomcat-tomee-cluster
+name: Tomcat/TomEE cluster with High Availability 
+categories:
+  - apps/clusters
+homepage: https://github.com/jelastic-jps/tomcat-cluster
+description:
+  text: Interconnection of TomEE servers with pre-configured session replication and scalable load balancing. Both Load Balancer and Application Server layers can be scaled horizontally.
+  short: Tomcat/TomEE cluster
+  
+onBeforeInit: https://raw.githubusercontent.com/SiryjVyiko/tomcat-cluster/master/scripts/quotascheck.js
+
+onBeforeInstall: |
+  return {result:0, "nodes":[{"cloudlets":8,"nodeGroup":"bl","nodeType":"nginx"},{"cloudlets":6,"count":"${settings.nodes}","nodeGroup":"cp","nodeType":"${settings.stack}","cluster":true}]};
+  
+nodes: definedInOnBeforeInstall
+  
+success: /text/success-certified.md

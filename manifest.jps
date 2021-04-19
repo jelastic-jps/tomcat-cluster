@@ -1,7 +1,7 @@
 type: install
 version: 1.8.1
 baseUrl: https://raw.githubusercontent.com/jelastic-jps/tomcat-cluster/master
-logo: /images/tomcat-cluster-logo-70px.png
+logo: /images/tomcat-cluster-logo.svg
 id: tomcat-tomee-cluster
 name: Tomcat/TomEE cluster with High Availability 
 categories:

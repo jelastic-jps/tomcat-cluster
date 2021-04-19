@@ -11,7 +11,7 @@ description:
   text: Interconnection of TomEE servers with pre-configured session replication and scalable load balancing. Both Load Balancer and Application Server layers can be scaled horizontally.
   short: Tomcat/TomEE cluster
   
-onBeforeInit: https://raw.githubusercontent.com/jelastic-jps/tomcat-cluster/master/scripts/quotascheck.js
+onBeforeInit: scripts/quotascheck.js
 
 onBeforeInstall: |
   return {result:0, "nodes":[{"cloudlets":8,"nodeGroup":"bl","nodeType":"nginx"},{"cloudlets":6,"count":"${settings.nodes}","nodeGroup":"cp","nodeType":"${settings.stack}","cluster":true}]};

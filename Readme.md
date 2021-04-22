@@ -34,9 +34,9 @@ In case you’d like to setup scaling strategy for your cluster, refer to the ap
 To instantly host your own scalable Tomcat/TomEE cluster, click the **DEPLOY TO JELASTIC** button below. Within the opened frame, specify your email address, choose one of the [Jelastic Public Cloud providers](https://jelastic.cloud/) and press **Install**.
 
 
-[![Deploy](https://github.com/jelastic-jps/git-push-deploy/raw/master/images/deploy-to-jelastic.png)](https://jelastic.com/install-application/?manifest=https://raw.githubusercontent.com/jelastic-jps/tomcat-cluster/master/manifest.jps)
+[![Deploy](https://github.com/jelastic-jps/git-push-deploy/raw/main/images/deploy-to-jelastic.png)](https://jelastic.com/install-application/?manifest=https://raw.githubusercontent.com/jelastic-jps/tomcat-cluster/main/manifest.jps)
 
 ### Private Cloud
 
-If working within Jelastic Private Cloud, copy link of the [*_manifest.jps_*](https://raw.githubusercontent.com/jelastic-jps/tomcat-cluster/master/manifest.jps) file above and [import](https://docs.jelastic.com/environment-import) it to the required Jelastic installation. 
+If working within Jelastic Private Cloud, copy link of the [*_manifest.jps_*](https://raw.githubusercontent.com/jelastic-jps/tomcat-cluster/main/manifest.jps) file above and [import](https://docs.jelastic.com/environment-import) it to the required Jelastic installation. 
 

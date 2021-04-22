@@ -3,7 +3,7 @@
    "jps"         : "https://raw.githubusercontent.com/jelastic-jps/tomcat-cluster/v1.0/addons/auto-clustering/manifest.yml",
    "required"    : false,
    "defaultState": false,
-   "description" : "<h3>Scalable Cluster with High Availability</h3>Interconnection of TomEE servers with pre-configured session replication and scalable load balancing. Both Load Balancer and Application Server layers can be scaled horizontally. <a href='https://jelastic.com/blog/tomcat-and-tomee-clusterization-in-jelastic-paas/'>Learn More</a> <img width='250' height='250' src='https://raw.githubusercontent.com/jelastic/icons/master/tomee/jelastic/images/tip-auto-clustering.svg?sanitize=true'>",
+   "description" : "<h3>Scalable Cluster with High Availability</h3>Interconnection of TomEE servers with pre-configured session replication and scalable load balancing. Both Load Balancer and Application Server layers can be scaled horizontally. <a href='https://jelastic.com/blog/tomcat-and-tomee-clusterization-in-jelastic-paas/'>Learn More</a> <img width='250' height='250' src='https://raw.githubusercontent.com/jelastic/icons/main/tomee/jelastic/images/tip-auto-clustering.svg?sanitize=true'>",
    "validation": {
         "minCount": 2
    }

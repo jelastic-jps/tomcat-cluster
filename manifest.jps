@@ -8,7 +8,7 @@ categories:
   - apps/clusters
 homepage: https://github.com/jelastic-jps/tomcat-cluster
 description:
-  text: Interconnection of TomEE servers with pre-configured session replication and scalable load balancing. Both Load Balancer and Application Server layers can be scaled horizontally.
+  text: Interconnection of Tomcat/TomEE servers with pre-configured session replication and scalable load balancing. Both Load Balancer and Application Server layers can be scaled horizontally.
   short: Tomcat/TomEE cluster
   
 onBeforeInit: scripts/quotascheck.js

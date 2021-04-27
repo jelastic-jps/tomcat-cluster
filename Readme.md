@@ -1,5 +1,5 @@
 <p align="left">
-<img src="img/tomcat-tomee-logo.png" width="150">
+<img src="images/tomcat-tomee-logo.png" width="150">
 </p>
 
 # Tomcat/TomEE Auto-Clustering
@@ -14,7 +14,7 @@ Due to the native Tomcat clustering architecture, its topology includes two node
 - Scalable *Worker* **Node 1..N** - application servers to run the required app and web services
 
 <p align="left">
-<img src="img/tomcat-tomee-topology.png" width="350">
+<img src="images/tomcat-tomee-topology.png" width="350">
 </p>
 
 Current implementation of Jelastic scalable Tomcat/TomEE cluster is built on top of Docker containers. This ensures additional reliability through operating each node as an isolated instance and enables simple [container update](https://docs.jelastic.com/docker-update) procedure. 
@@ -34,7 +34,7 @@ In case you’d like to setup scaling strategy for your cluster, refer to the ap
 To instantly host your own scalable Tomcat/TomEE cluster, click the **DEPLOY TO JELASTIC** button below. Within the opened frame, specify your email address, choose one of the [Jelastic Public Cloud providers](https://jelastic.cloud/) and press **Install**.
 
 
-[![Deploy](https://github.com/jelastic-jps/git-push-deploy/raw/main/images/deploy-to-jelastic.png)](https://jelastic.com/install-application/?manifest=https://raw.githubusercontent.com/jelastic-jps/tomcat-cluster/main/manifest.jps)
+[![Deploy](images/deploy-to-jelastic.png)](https://jelastic.com/install-application/?manifest=https://raw.githubusercontent.com/jelastic-jps/tomcat-cluster/main/manifest.jps)
 
 ### Private Cloud
 

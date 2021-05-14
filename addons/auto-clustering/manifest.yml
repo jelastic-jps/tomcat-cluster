@@ -12,7 +12,6 @@ nodeGroupAlias:
   ${settings.nodeGroup}: cp
 
 globals:
-  serverConfig: /opt/tomcat/conf/server.xml
   mainRulesFile: /etc/sysconfig/iptables
   customRulesFile: /etc/sysconfig/iptables-custom
                                                                                                                                                                               

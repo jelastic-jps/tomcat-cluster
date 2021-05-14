@@ -72,6 +72,12 @@ onBeforeRemoveNode[cp]:
       type: update
       id: tomcat-cluster
       name: Tomcat Cluster Logic
+
+onBeforeMigrate:
+  if (${env.status} != 1): 
+    stopEvent:
+      type: warning
+      message: Cloning of stopped Tomcat/TomEE cluster is not supported.
       
 actions: 
   addFWRuleForEnv:

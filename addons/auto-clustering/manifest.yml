@@ -77,7 +77,7 @@ onBeforeMigrate:
   if (${env.status} != 1): 
     stopEvent:
       type: warning
-      message: Cloning of stopped Tomcat/TomEE cluster is not supported.
+      message: Migration of stopped Tomcat/TomEE cluster is not supported.
       
 actions: 
   addFWRuleForEnv:

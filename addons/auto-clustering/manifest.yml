@@ -152,7 +152,6 @@ actions:
   cleanupCustomFWRules: 
     - cmd[${this}]: |-
         sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.mainRulesFile};
-        service iptables restart;
         sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.customRulesFile}
       user: root
   

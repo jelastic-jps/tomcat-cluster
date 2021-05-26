@@ -151,8 +151,8 @@ actions:
  
   cleanupCustomFWRules: 
     - cmd[${this}]: |-
-        sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.mainRulesFile};
-        sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.customRulesFile}
+        [ -e ${globals.customRulesFile} ] && sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.customRulesFile};
+        [ -e ${globals.mainRulesFile} ] && sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.mainRulesFile}
       user: root
   
   applyHostName:

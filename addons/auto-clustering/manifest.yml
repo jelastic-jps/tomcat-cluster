@@ -153,7 +153,7 @@ actions:
     - cmd[${this}]: |-
         [ -e ${globals.customRulesFile} ] && sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.customRulesFile};
         [ -e ${globals.mainRulesFile} ] && sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.mainRulesFile};
-        service iptables reload;
+        grep -q 'FIREWALL_ENABLED=1' /etc/jelastic/metainf.conf && service iptables reload || true
       user: root
   
   applyHostName:

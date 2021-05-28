@@ -162,6 +162,7 @@ actions:
       
   addNodes:
     - cmd[cp]: jcm restoreClusterEntity ${baseUrl}
+      user: root
     - forEach(nodes.cp):
       - cmd[cp]: jcm addNode ${@i.intIP} ${@i.id}
         user: root

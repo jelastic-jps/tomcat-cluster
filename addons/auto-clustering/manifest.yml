@@ -31,6 +31,7 @@ onBeforeScaleIn[cp]:
     - cmd[cp]: jcm removeNode ${@i.intIP}
     
 onAfterScaleIn[cp]:
+  - addNodes
   - cmd[cp]: jem service restart
 
 onAfterScaleOut[cp]:
@@ -54,11 +55,15 @@ onUninstall:
   - removeClusteringFirewallRule
   
 onAfterMigrate:
+  - cmd[cp]: jcm restoreClusterEntity ${baseUrl}
+    user: root
   - cleanupNodes: ${nodes.cp.join(id,)}
   - addNodes
   - cmd[cp]: jem service restart
   
 onAfterRedeployContainer[cp]:
+  - cmd[cp]: jcm restoreClusterEntity ${baseUrl}
+    user: root
   - checkClusterConfig
   - addNodes
   - cmd[cp]: jem service restart

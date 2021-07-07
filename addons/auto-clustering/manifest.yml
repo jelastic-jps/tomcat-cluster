@@ -87,7 +87,7 @@ onBeforeMigrate:
 actions: 
   addFWRuleForEnv:
     - script: |
-        var envName = "${env.name}", nodeGroup="cp", inputRuleExists = new Boolean(false);
+        var envName = "${env.name}", nodeGroup="${settings.nodeGroup}", inputRuleExists = new Boolean(false);
         var inputRule = {"direction":"INPUT","name":"Clustering","protocol":"TCP","ports":4004,"src":"ALL","priority":1200,"action":"ALLOW"};
         var outputRule = {"direction":"OUTPUT","name":"Clustering","protocol":"TCP","ports":4004,"dst":"ALL","priority":1300,"action":"ALLOW"};
         if (jelastic.environment.security) {

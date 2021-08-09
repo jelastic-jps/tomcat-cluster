@@ -69,6 +69,9 @@ onAfterRedeployContainer[cp]:
   - cmd[cp]: jem service restart
   
 onBeforeSetCloudletCount[cp]:
+  - forEach(nodes.cp):
+    - cmd[${@i.id}]: jcm addNode ${@i.intIP} ${@i.id}
+      user: root
   - applyHostName
   
 onBeforeRemoveNode[cp]:

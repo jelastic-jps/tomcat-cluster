@@ -1,7 +1,6 @@
-type: update
 version: 1.8.1
 id: tomcat-cluster
-baseUrl: https://raw.githubusercontent.com/jelastic-jps/tomcat-cluster/v1.0 
+baseUrl: https://raw.githubusercontent.com/dimkadt/tomcat-cluster/v1.1
 description:
   short: Tomcat Cluster Logic
 name: Tomcat Cluster Logic
@@ -14,6 +13,8 @@ nodeGroupAlias:
 globals:
   mainRulesFile: /etc/sysconfig/iptables
   customRulesFile: /etc/sysconfig/iptables-custom
+  nftMainRulesFile: /etc/nftables/jelastic.nft
+  nftCustomRulesFile: /etc/nftables/static-rules.nft
                                                                                                                                                                               
 onInstall:
   - cleanupCustomFWRules: ${nodes.cp.join(id,)}
@@ -25,6 +26,7 @@ onInstall:
   - addFWRuleForEnv
   - addFWRuleForContainer: ${nodes.cp.join(id,)}
   - cmd[cp]: jem service restart
+    user: root
             
 onBeforeScaleIn[cp]:
   - forEach (event.response.nodes):
@@ -33,6 +35,7 @@ onBeforeScaleIn[cp]:
 onAfterScaleIn[cp]:
   - addNodes
   - cmd[cp]: jem service restart
+    user: root
 
 onAfterScaleOut[cp]:
   - cleanupCustomFWRules: ${event.response.nodes.join(id,)}
@@ -42,6 +45,7 @@ onAfterScaleOut[cp]:
   - addNodes
   - addFWRuleForContainer: ${event.response.nodes.join(id,)}
   - cmd[cp]: jem service restart
+    user: root
             
 onAfterClone:
   - script: delete MANIFEST.id; return {result:0, jps:MANIFEST};
@@ -60,6 +64,7 @@ onAfterMigrate:
   - cleanupNodes: ${nodes.cp.join(id,)}
   - addNodes
   - cmd[cp]: jem service restart
+    user: root
   
 onAfterRedeployContainer[cp]:
   - cmd[cp]: jcm restoreClusterEntity ${baseUrl}
@@ -67,6 +72,7 @@ onAfterRedeployContainer[cp]:
   - checkClusterConfig
   - addNodes
   - cmd[cp]: jem service restart
+    user: root
   
 onBeforeSetCloudletCount[cp]:
   - forEach(nodes.cp):
@@ -121,9 +127,17 @@ actions:
         
   addFWRuleForContainer:
     - cmd[${this}]: |-
-        if ! grep -q "Tomcat\/TomEE Clustering" ${globals.customRulesFile}; then
-            echo -e "*filter\n-A INPUT -p tcp -m tcp --dport 4004 -j ACCEPT -m comment --comment \"Tomcat/TomEE Clustering\"" >> ${globals.customRulesFile}
-            echo -e "-A OUTPUT -p tcp -m tcp --dport 4004 -j ACCEPT -m comment --comment \"Tomcat/TomEE Clustering\"\nCOMMIT" >> ${globals.customRulesFile}
+        FIREWALL_BACKEND=$(sed -rne '/VAP_FIREWALL_BACKEND=/{s/VAP_FIREWALL_BACKEND=([a-z])/\1/g;p}' /etc/jelastic/metainf.conf 2>/dev/null)
+        if [[ "x$FIREWALL_BACKEND" == "xnftables" ]]; then
+            if ! grep -q "Tomcat\/TomEE Clustering" ${globals.nftCustomRulesFile}; then
+                echo "insert rule ip filter INPUT ip saddr 0.0.0.0/0 tcp dport 4444 counter accept comment \"Tomcat/TomEE Clustering\"" >>${globals.nftCustomRulesFile}
+                echo "insert rule ip filter OUTPUT ip daddr 0.0.0.0/0 tcp dport 4444 counter accept comment \"Tomcat/TomEE Clustering\"" >>${globals.nftCustomRulesFile}
+            fi
+        else
+            if ! grep -q "Tomcat\/TomEE Clustering" ${globals.customRulesFile}; then
+                echo -e "*filter\n-A INPUT -p tcp -m tcp --dport 4004 -j ACCEPT -m comment --comment \"Tomcat/TomEE Clustering\"" >> ${globals.customRulesFile}
+                echo -e "-A OUTPUT -p tcp -m tcp --dport 4004 -j ACCEPT -m comment --comment \"Tomcat/TomEE Clustering\"\nCOMMIT" >> ${globals.customRulesFile}
+            fi
         fi
         
   removeClusteringFirewallRule:
@@ -159,9 +173,16 @@ actions:
  
   cleanupCustomFWRules: 
     - cmd[${this}]: |-
-        [ -e ${globals.customRulesFile} ] && sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.customRulesFile};
-        [ -e ${globals.mainRulesFile} ] && sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.mainRulesFile};
-        grep -q 'FIREWALL_ENABLED=1' /etc/jelastic/metainf.conf && service iptables reload || true
+        FIREWALL_BACKEND=$(sed -rne '/VAP_FIREWALL_BACKEND=/{s/VAP_FIREWALL_BACKEND=([a-z])/\1/g;p}' /etc/jelastic/metainf.conf 2>/dev/null)
+        if [[ "x$FIREWALL_BACKEND" == "xnftables" ]]; then
+            [ -e ${globals.nftCustomRulesFile} ] && sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.nftCustomRulesFile};
+            [ -e ${globals.nftMainRulesFile} ] && sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.nftMainRulesFile};
+            grep -q 'FIREWALL_ENABLED=1' /etc/jelastic/metainf.conf && systemctl reload nftables || true
+        else
+            [ -e ${globals.customRulesFile} ] && sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.customRulesFile};
+            [ -e ${globals.mainRulesFile} ] && sed -ci -e "/4004.*Tomcat\/TomEE Clustering/d" ${globals.mainRulesFile};
+            grep -q 'FIREWALL_ENABLED=1' /etc/jelastic/metainf.conf && service iptables reload || true
+       fi
       user: root
   
   applyHostName:

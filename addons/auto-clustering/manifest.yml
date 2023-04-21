@@ -140,7 +140,8 @@ actions:
                 echo -e "-A OUTPUT -p tcp -m tcp --dport 4004 -j ACCEPT -m comment --comment \"Tomcat/TomEE Clustering\"\nCOMMIT" >> ${globals.customRulesFile}
             fi
         fi
-        
+      user: root
+
   removeClusteringFirewallRule:
     - script: |
         var envName = "${env.name}", nodeGroup="cp";

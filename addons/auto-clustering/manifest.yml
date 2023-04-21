@@ -131,8 +131,8 @@ actions:
         FIREWALL_BACKEND=$(sed -rne '/VAP_FIREWALL_BACKEND=/{s/VAP_FIREWALL_BACKEND=([a-z])/\1/g;p}' /etc/jelastic/metainf.conf 2>/dev/null)
         if [[ "x$FIREWALL_BACKEND" == "xnftables" ]]; then
             if ! grep -q "Tomcat\/TomEE Clustering" ${globals.nftCustomRulesFile}; then
-                echo "insert rule ip filter INPUT ip saddr 0.0.0.0/0 tcp dport 4444 counter accept comment \"Tomcat/TomEE Clustering\"" >>${globals.nftCustomRulesFile}
-                echo "insert rule ip filter OUTPUT ip daddr 0.0.0.0/0 tcp dport 4444 counter accept comment \"Tomcat/TomEE Clustering\"" >>${globals.nftCustomRulesFile}
+                echo "insert rule ip filter INPUT ip saddr 0.0.0.0/0 tcp dport 4004 counter accept comment \"Tomcat/TomEE Clustering\"\n" >>${globals.nftCustomRulesFile}
+                echo "insert rule ip filter OUTPUT ip daddr 0.0.0.0/0 tcp dport 4004 counter accept comment \"Tomcat/TomEE Clustering\"\n" >>${globals.nftCustomRulesFile}
             fi
         else
             if ! grep -q "Tomcat\/TomEE Clustering" ${globals.customRulesFile}; then

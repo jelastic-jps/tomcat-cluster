@@ -1,3 +1,4 @@
+type: update
 version: 1.8.1
 id: tomcat-cluster
 baseUrl: https://raw.githubusercontent.com/dimkadt/tomcat-cluster/v1.1

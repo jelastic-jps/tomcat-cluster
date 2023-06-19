@@ -14,8 +14,8 @@ nodeGroupAlias:
 globals:
   mainRulesFile: /etc/sysconfig/iptables
   customRulesFile: /etc/sysconfig/iptables-custom
-  nftMainRulesFile: /etc/nftables/jelastic.nft
-  nftCustomRulesFile: /etc/nftables/static-rules.nft
+  nftMainRulesFile: /etc/nftables/platform-defined.nft
+  nftCustomRulesFile: /etc/nftables/container-defined.nft
                                                                                                                                                                               
 onInstall:
   - cleanupCustomFWRules: ${nodes.cp.join(id,)}

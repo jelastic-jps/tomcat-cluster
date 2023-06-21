@@ -24,6 +24,9 @@ onInstall:
   - addNodes
   - addFWRuleForEnv
   - addFWRuleForContainer: ${nodes.cp.join(id,)}
+  - forEach(nodes.cp):
+    - cmd[${@i.id}]: xmlstarlet edit --inplace --update "/Cluster/Channel/Receiver/@address" --value "${@i.intIP}" /opt/tomcat/conf/tomcat-cluster.xml
+      user: root
   - cmd[cp]: jem service restart
             
 onBeforeScaleIn[cp]:

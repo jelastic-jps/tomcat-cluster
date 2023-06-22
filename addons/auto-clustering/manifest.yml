@@ -24,7 +24,6 @@ onInstall:
   - addNodes
   - addFWRuleForEnv
   - addFWRuleForContainer: ${nodes.cp.join(id,)}
-  - setReceiverAddress
   - cmd[cp]: jem service restart
             
 onBeforeScaleIn[cp]:
@@ -42,7 +41,6 @@ onAfterScaleOut[cp]:
   - applyHostName
   - addNodes
   - addFWRuleForContainer: ${event.response.nodes.join(id,)}
-  - setReceiverAddress
   - cmd[cp]: jem service restart
             
 onAfterClone:
@@ -61,7 +59,6 @@ onAfterMigrate:
     user: root
   - cleanupNodes: ${nodes.cp.join(id,)}
   - addNodes
-  - setReceiverAddress
   - cmd[cp]: jem service restart
   
 onAfterRedeployContainer[cp]:
@@ -69,7 +66,6 @@ onAfterRedeployContainer[cp]:
     user: root
   - checkClusterConfig
   - addNodes
-  - setReceiverAddress
   - cmd[cp]: jem service restart
   
 onBeforeSetCloudletCount[cp]:

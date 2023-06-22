@@ -24,6 +24,7 @@ onInstall:
   - addNodes
   - addFWRuleForEnv
   - addFWRuleForContainer: ${nodes.cp.join(id,)}
+  - setReceiverAddress
   - cmd[cp]: jem service restart
             
 onBeforeScaleIn[cp]:

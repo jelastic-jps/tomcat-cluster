@@ -14,6 +14,7 @@ nodeGroupAlias:
 globals:
   mainRulesFile: /etc/sysconfig/iptables
   customRulesFile: /etc/sysconfig/iptables-custom
+  tomcatClusterConfig: /opt/tomcat/conf/tomcat-cluster.xml
                                                                                                                                                                               
 onInstall:
   - cleanupCustomFWRules: ${nodes.cp.join(id,)}
@@ -24,6 +25,7 @@ onInstall:
   - addNodes
   - addFWRuleForEnv
   - addFWRuleForContainer: ${nodes.cp.join(id,)}
+  - setReceiverAddress
   - cmd[cp]: jem service restart
             
 onBeforeScaleIn[cp]:
@@ -41,6 +43,7 @@ onAfterScaleOut[cp]:
   - applyHostName
   - addNodes
   - addFWRuleForContainer: ${event.response.nodes.join(id,)}
+  - setReceiverAddress
   - cmd[cp]: jem service restart
             
 onAfterClone:
@@ -59,6 +62,7 @@ onAfterMigrate:
     user: root
   - cleanupNodes: ${nodes.cp.join(id,)}
   - addNodes
+  - setReceiverAddress
   - cmd[cp]: jem service restart
   
 onAfterRedeployContainer[cp]:
@@ -66,6 +70,7 @@ onAfterRedeployContainer[cp]:
     user: root
   - checkClusterConfig
   - addNodes
+  - setReceiverAddress
   - cmd[cp]: jem service restart
   
 onBeforeSetCloudletCount[cp]:
@@ -91,7 +96,8 @@ actions:
   setReceiverAddress:
     - forEach(nodes.cp):
       - cmd[${@i.id}]: |-
-          xmlstarlet edit --inplace --update "/Cluster/Channel/Receiver/@address" --value "${@i.intIP}" /opt/tomcat/conf/tomcat-cluster.xml
+          xmlstarlet edit --inplace --update "/Cluster/Channel/Receiver/@address" --value "${@i.intIP}" ${globals.tomcatClusterConfig}
+          sed -ci -e '/?xml version/d' ${globals.tomcatClusterConfig}
           systemctl reset-failed tomcat.service 
         user: root
 

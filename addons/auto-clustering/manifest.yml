@@ -16,6 +16,7 @@ globals:
   customRulesFile: /etc/sysconfig/iptables-custom
   nftMainRulesFile: /etc/nftables/platform-defined.nft
   nftCustomRulesFile: /etc/nftables/container-defined.nft
+  tomcatClusterConfig: /opt/tomcat/conf/tomcat-cluster.xml
                                                                                                                                                                               
 onInstall:
   - cleanupCustomFWRules: ${nodes.cp.join(id,)}
@@ -26,6 +27,7 @@ onInstall:
   - addNodes
   - addFWRuleForEnv
   - addFWRuleForContainer: ${nodes.cp.join(id,)}
+  - setReceiverAddress
   - cmd[cp]: jem service restart
     user: root
             
@@ -45,6 +47,7 @@ onAfterScaleOut[cp]:
   - applyHostName
   - addNodes
   - addFWRuleForContainer: ${event.response.nodes.join(id,)}
+  - setReceiverAddress
   - cmd[cp]: jem service restart
     user: root
             
@@ -64,6 +67,7 @@ onAfterMigrate:
     user: root
   - cleanupNodes: ${nodes.cp.join(id,)}
   - addNodes
+  - setReceiverAddress
   - cmd[cp]: jem service restart
     user: root
   
@@ -72,6 +76,7 @@ onAfterRedeployContainer[cp]:
     user: root
   - checkClusterConfig
   - addNodes
+  - setReceiverAddress
   - cmd[cp]: jem service restart
     user: root
   
@@ -95,6 +100,14 @@ onBeforeMigrate:
       message: Migration of stopped Tomcat/TomEE cluster is not supported.
       
 actions: 
+  setReceiverAddress:
+    - forEach(nodes.cp):
+      - cmd[${@i.id}]: |-
+          xmlstarlet edit --inplace --update "/Cluster/Channel/Receiver/@address" --value "${@i.intIP}" ${globals.tomcatClusterConfig}
+          sed -ci -e '/?xml version/d' ${globals.tomcatClusterConfig}
+          systemctl reset-failed tomcat.service 
+        user: root
+
   addFWRuleForEnv:
     - script: |
         var envName = "${env.name}", nodeGroup="${settings.nodeGroup}", inputRuleExists = new Boolean(false);
